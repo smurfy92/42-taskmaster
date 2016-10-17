@@ -3,34 +3,68 @@ from yaml import load, dump
 from proccess import *
 
 proc = {}
-tab = {}
+processes = {}
+
+promptinit = """\n
+  ____   __    ___  _  _  __  __    __    ___  ____  ____  ____
+ (_  _) /__\  / __)( )/ )(  \/  )  /__\  / __)(_  _)( ___)(  _ \\
+   )(  /(__)\ \__ \ )  (  )    (  /(__)\ \__ \  )(   )__)  )   /
+  (__)(__)(__)(___/(_)\_)(_/\/\_)(__)(__)(___/ (__) (____)(_)\_)
+"""
 
 def init():
-    print "Hello world"
+    rows, columns = os.popen('stty size', 'r').read().split()
+    print "\033[92m"+promptinit+"\033[0m"
     with open('test.conf', 'r') as f:
         doc = load(f)
     for proc in doc:
-        tab[proc] = Proccess(proc, doc[proc])
+        processes[proc] = Proccess(proc, doc[proc])
 
 class Prompt(cmd.Cmd):
-    """Simple command processor example."""
     prompt = "\033[92mTaskmaster -> \033[0m"
-
     def do_start(self, line):
         t = line.split(" ")
-        if (tab[t[0]]):
-            tab[t[0]].start()
+        if (t[0] in processes):
+            processes[t[0]].start()
+            print "Starting "+ t[0]
+        else:
+            if t[0]:
+                print "No program "+ t[0]
+            else:
+                print "You need to specify program"
 
     def do_stop(self, line):
     	tab = line.split(" ")
-        if (tab[0]):
-            proc[tab[0]].terminate()
-        print tab
+        if (tab[0] in processes):
+            processes[tab[0]].proccess.terminate()#verifier que le program est lance
+        else:
+            if tab[0]:
+                print "No program "+ tab[0]
+            else:
+                print "You need to specify program"
+
+    def do_restart(self, line):
+        tab = line.split(" ")
+        if (tab[0] in processes):
+            processes[tab[0]].proccess.terminate()
+            processes[tab[0]].start()
+        else:
+            if tab[0]:
+                print "No program "+ tab[0]
+            else:
+                print "You need to specify program"
 
     def do_status(self, line):
-        tab = line.split(" ")
-        for p in tab:
-            p.status
+        tab = line.split(" ");
+        if tab[0] == "all":
+            for p in processes:
+                if processes[p]:
+                    processes[p].status()
+        else:
+            if tab[0] in processes:
+                processes[tab[0]].status()
+            else:
+                print "no process named "+tab[0]
 
     def do_reload(self, line):
     	tab = {}

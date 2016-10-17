@@ -7,12 +7,16 @@ class Proccess:
 		self.name = name
 		self.command = data["command"]
 		if "stdout" in data:
-			f = open(data["stdout"])
+			f = open(data["stdout"],"a+")
 			self.stdout = f
 		else:
 			self.stdout = None
 		self.proccess = None
 		self.pid = None
+
+
+		if "autostart" in data:
+			self.start()
 
 	def start(self):
 		self.proccess = subprocess.Popen(
@@ -21,6 +25,11 @@ class Proccess:
 			stdin = subprocess.PIPE,
 			stdout = self.stdout);
 		self.pid = self.proccess.pid
+		self.check()
 
 	def status(self):
-		print "name ->"+self.name+" pid->"+ self.pid
+		if (self.pid):
+			print "NAME : "+self.name+" | PID : "+ str(self.pid)
+
+	def check(self):
+		print "check"
