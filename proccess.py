@@ -12,10 +12,13 @@ class Proccess:
 		self.name = name
 		self.command = data["command"]
 		if "stdout" in data:
-			f = open(data["stdout"],"a+")
-			self.stdout = f
+			if data["stdout"] == "stdout" or data["stdout"] == "stderr":
+				self.stdout = subprocess.PIPE
+			else:
+				f = open(data["stdout"],"a+")
+				self.stdout = f
 		else:
-			self.stdout = None
+			self.stdout = subprocess.PIPE
 		self.proccess = None
 		self.pid = None
 		self.statuss = "STOPPED"
@@ -48,12 +51,12 @@ class Proccess:
 			env = os.environ,
 			stdin = subprocess.PIPE,
 			stdout = self.stdout);
-		self.proccess.communicate()
+		stdout, stderr = self.proccess.communicate()
+		print stdout
 		self.pid = self.proccess.pid
 		self.statuss = "RUNNING"
 		self.starttime = time.time()
 		log.info(" started : "+self.name + " uptime : "+time.strftime("%H:%M:%S", time.gmtime(self.starttime)))
-		#self.check()
 
 	def status(self):
 		if (self.statuss == "RUNNING"):
