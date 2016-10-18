@@ -21,9 +21,9 @@ class Proccess:
 		self.statuss = "STOPPED"
 		self.starttime = None
 		if "autostart" in data:
-			self.start()
+			self.start(init=1)
 
-	def start(self):
+	def start(self, init=0):
 		self.proccess = subprocess.Popen(
 			self.command.split(" "),
 			shell = True, env = os.environ,
@@ -32,19 +32,27 @@ class Proccess:
 		self.pid = self.proccess.pid
 		self.statuss = "RUNNING"
 		self.starttime = time.time()
-		log.info("started :"+self.name + "time :"+time.strftime("uptime: %H:%M:%S", time.gmtime(self.starttime)))
+		log.info(" started : "+self.name + " uptime : "+time.strftime("%H:%M:%S", time.gmtime(self.starttime)))
+		if init == 0:
+			print "Started : "+self.name
 		#self.check()
 
 	def status(self):
 		if (self.statuss == "RUNNING"):
 			timer = time.time()
 			time_delta = time.gmtime(timer - self.starttime)
-			curr_time = time.strftime("uptime: %H:%M:%S", time_delta)
-
-			self.name = "%10s" % self.name
-			print ("NAME : {0}| STATUS : "+self.statuss+" | PID : "+ str(self.pid)+"| STARTTIME :"+ curr_time).format(self.name)
+			curr_time = time.strftime("%H:%M:%S", time_delta)
+			print ("NAME : {0} | STATUS : {1} | PID : {2} | UPTIME :"+ curr_time).format(self.name, self.statuss, str(self.pid))
 		else:
 			print "NAME : "+self.name+"| STATUS : "+self.statuss
+
+	def stop(self):
+		print "Stopped : "+self.name
+		log.info(" stopped : "+ self.name)
+		self.proccess.terminate()
+		self.pid = None
+		self.statuss = "STOPPED"
+		self.starttime = None
 
 	def check(self):
 		print "check"
