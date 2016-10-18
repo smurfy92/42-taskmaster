@@ -20,21 +20,39 @@ class Proccess:
 		self.pid = None
 		self.statuss = "STOPPED"
 		self.starttime = None
+		if "restart" in data:
+			self.restart = data["restart"]
+		if "expected" in data:
+			self.expected = data["expected"]
+		if "exitcodes" in data:
+			self.exitcodes = data["exitcodes"]
+		if "restartnb" in data:
+			self.restartnb = data["restartnb"]
+		else:
+			self.restartnb = 0
+		if "signal" in data:
+			self.signal = data["signal"]
+		if "timetoexit" in data:
+			self.timetoexit = data["timetoexit"]
 		if "autostart" in data:
 			self.start(init=1)
 
+
+
 	def start(self, init=0):
+		if init == 0:
+			print "Started : "+self.name
 		self.proccess = subprocess.Popen(
 			self.command.split(" "),
-			shell = True, env = os.environ,
+			shell = True,
+			env = os.environ,
 			stdin = subprocess.PIPE,
 			stdout = self.stdout);
+		self.proccess.communicate()
 		self.pid = self.proccess.pid
 		self.statuss = "RUNNING"
 		self.starttime = time.time()
 		log.info(" started : "+self.name + " uptime : "+time.strftime("%H:%M:%S", time.gmtime(self.starttime)))
-		if init == 0:
-			print "Started : "+self.name
 		#self.check()
 
 	def status(self):
