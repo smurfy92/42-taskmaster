@@ -113,7 +113,7 @@ class Proccess:
 		log.info(" stopped : "+ self.name)
 		if self.signal:
 			try:
-				self.proccess.seng_signal(self.signal)
+				self.proccess.send_signal(self.signal)
 			except Exception, e:
 				log.error(self.name+" signal not permitted")
 				print self.name +" signal not working"
@@ -126,6 +126,7 @@ class Proccess:
 	def check(self):
 		if self.proccess.poll() != None:
 			self.rc = self.proccess.poll()
+			print self.rc
 			self.pid = None
 			self.statuss = "STOPPED"
 			self.starttime = None
