@@ -2,6 +2,7 @@ import subprocess
 import os
 import time
 import logging
+import shlex
 
 log = logging
 log.basicConfig(filename = '/tmp/taskmaster.log', level=logging.DEBUG)
@@ -12,13 +13,15 @@ class Proccess:
 		self.name = name
 		self.command = data["command"]
 		if "stdout" in data:
-			if data["stdout"] == "stdout" or data["stdout"] == "stderr":
-				self.stdout = subprocess.PIPE
-			else:
-				f = open(data["stdout"],"a+")
-				self.stdout = f
+			f = open(data["stdout"],"a+")
+			self.stdout = f
 		else:
-			self.stdout = subprocess.PIPE
+			self.stdout = None
+		if "stderr" in data:
+			f = open(data["stderr"],"a+")
+			self.stderr = f
+		else:
+			self.stderr = None
 		self.proccess = None
 		self.pid = None
 		self.statuss = "STOPPED"
@@ -46,13 +49,12 @@ class Proccess:
 		if init == 0:
 			print "Started : "+self.name
 		self.proccess = subprocess.Popen(
-			self.command.split(" "),
+			self.command,
 			shell = True,
 			env = os.environ,
 			stdin = subprocess.PIPE,
-			stdout = self.stdout);
-		stdout, stderr = self.proccess.communicate()
-		print stdout
+			stdout = self.stdout,
+			stderr = self.stderr);
 		self.pid = self.proccess.pid
 		self.statuss = "RUNNING"
 		self.starttime = time.time()
