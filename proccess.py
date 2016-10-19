@@ -126,7 +126,6 @@ class Proccess:
 	def check(self):
 		if self.proccess.poll() != None:
 			self.rc = self.proccess.poll()
-			print self.rc
 			self.pid = None
 			self.statuss = "STOPPED"
 			self.starttime = None

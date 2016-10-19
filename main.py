@@ -2,6 +2,7 @@ import cmd
 from yaml import load, dump
 from proccess import *
 import sys
+import threading
 
 processes = {}
 
@@ -16,6 +17,12 @@ promptinit = """\n
 |######     ### ######## ###    ######       ######     ### ########    ###    #############    ###
 |____________________________________________________________________________________________
 """
+
+def loop():
+    while True:
+        for proc in processes:
+            if processes[proc].proccess:
+                processes[proc].check()
 
 def init():
     try:
@@ -114,4 +121,7 @@ class Prompt(cmd.Cmd):
 
 if __name__ == '__main__':
     init()
+    th = threading.Thread(target=loop)
+    th.daemon = True
+    th.start()
     Prompt().cmdloop()
