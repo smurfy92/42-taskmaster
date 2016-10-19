@@ -1,0 +1,16 @@
+total 32
+-rw--w-r--  1 jtranchi  2015_paris     0 Oct 19 16:57 ls.err
+-rw--w-r--  1 jtranchi  2015_paris     0 Oct 19 16:57 ls.out
+-rw-r--r--  1 jtranchi  2015_paris  3626 Oct 19 16:50 main.py
+-rw-r--r--  1 jtranchi  2015_paris  3203 Oct 19 16:56 proccess.py
+-rw-r--r--  1 jtranchi  2015_paris  3936 Oct 19 16:56 proccess.pyc
+-rw-r--r--  1 jtranchi  2015_paris     0 Oct 19 13:55 rm.err
+-rw-r--r--  1 jtranchi  2015_paris   349 Oct 19 16:46 test.conf
+total 48
+-rw--w-r--  1 jtranchi  2015_paris     0 Oct 19 16:57 ls.err
+-rw--w-r--  1 jtranchi  2015_paris   451 Oct 19 16:57 ls.out
+-rw-r--r--  1 jtranchi  2015_paris  3626 Oct 19 16:50 main.py
+-rw-r--r--  1 jtranchi  2015_paris  3482 Oct 19 17:30 proccess.py
+-rw-r--r--  1 jtranchi  2015_paris  4171 Oct 19 17:31 proccess.pyc
+-rw-r--r--  1 jtranchi  2015_paris     0 Oct 19 13:55 rm.err
+-rw-r--r--  1 jtranchi  2015_paris   367 Oct 19 17:31 test.conf

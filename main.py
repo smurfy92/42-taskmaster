@@ -1,6 +1,7 @@
 import cmd
 from yaml import load, dump
 from proccess import *
+import sys
 
 processes = {}
 
@@ -17,12 +18,18 @@ promptinit = """\n
 """
 
 def init():
+    try:
+        with open('test.conf', 'r') as f:
+            doc = load(f)
+        for proc in doc:
+            processes[proc] = Proccess(proc, doc[proc])
+    except:
+        print "Error in config file"
+        log.error("Error in config file")
+        sys.exit(0)
     rows, columns = os.popen('stty size', 'r').read().split()
     print "\033[92m"+promptinit+"\033[0m"
-    with open('test.conf', 'r') as f:
-        doc = load(f)
-    for proc in doc:
-        processes[proc] = Proccess(proc, doc[proc])
+
 
 class Prompt(cmd.Cmd):
     prompt = "\033[92mTaskmaster -> \033[0m"
@@ -78,6 +85,10 @@ class Prompt(cmd.Cmd):
                 processes[tab[0]].status()
             else:
                 print "no process named "+tab[0]
+
+    def do_check(self, line):
+        tab = line.split(" ")
+        processes[tab[0]].check()
 
     def do_reload(self, line):
     	tab = line.split(" ")
