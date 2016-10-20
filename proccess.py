@@ -6,6 +6,11 @@ import logging
 log = logging
 log.basicConfig(filename = '/tmp/taskmaster.log', level=logging.DEBUG)
 
+def killslowlybutsurely(p, time):
+	if p.proccess.poll() != None:
+		sleep(time)
+		p.proccess.terminate()
+
 class Proccess:
 
 	def __init__(self, name, data):
@@ -45,6 +50,10 @@ class Proccess:
 			self.restart = data["restart"]
 		else:
 			self.restart = None
+		if "gracefullstop" in data:
+			self.gracefullstop = data["gracefullstop"]
+		else:
+			self.gracefullstop = None
 		if "expected" in data:
 			self.expected = data["expected"]
 		if "exitcodes" in data:
@@ -55,12 +64,14 @@ class Proccess:
 			self.restartnb = 0
 		if "signal" in data:
 			self.signal = data["signal"]
-		if "timetoexit" in data:
-			self.timetoexit = data["timetoexit"]
 		if "workingdir" in data:
 			self.workingdir = data["workingdir"]
 		else:
 			self.workingdir = None
+		if "env" in data:
+			self.env = data["env"]
+		else:
+			self.env = None
 		if "autostart" in data:
 			self.start()
 
@@ -79,13 +90,16 @@ class Proccess:
 				stderr = open(self.stderr, "a+")
 			else:
 				stderr = None
+			my_env = os.environ.copy()
+			for key in self.env:
+				my_env[key] = self.env[key]
 			self.proccess = subprocess.Popen(
 				self.command,
 				shell = True,
-				env = os.environ,
 				stdin = subprocess.PIPE,
 				stdout = stdout,
-				stderr = stderr);
+				stderr = stderr,
+				env = my_env);
 			os.umask(oldmask)
 			self.pid = self.proccess.pid
 			self.startednb += 1
@@ -116,7 +130,10 @@ class Proccess:
 				self.proccess.send_signal(self.signal)
 			except Exception, e:
 				log.error(self.name+" signal not permitted")
-				print self.name +" signal not working"
+				print self.name +" signal not permitted"
+				th = threading.Thread(target=killslowlybutsurely)
+				th.daemon = True
+				th.start()
 		else:
 			self.proccess.terminate()
 		self.pid = None

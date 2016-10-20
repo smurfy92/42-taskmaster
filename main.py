@@ -70,7 +70,7 @@ class Prompt(cmd.Cmd):
     def do_restart(self, line):
         tab = line.split(" ")
         if (tab[0] in processes):
-            if processes[tab[0]].statuss == "RUNNING":
+            if processes[tab[0]].statuss == "RUNNING" or processes[tab[0]].statuss == "STARTING":
                 processes[tab[0]].stop()
                 processes[tab[0]].start()
             else:
@@ -93,10 +93,6 @@ class Prompt(cmd.Cmd):
             else:
                 print "no process named "+tab[0]
 
-    def do_check(self, line):
-        tab = line.split(" ")
-        processes[tab[0]].check()
-
     def do_reload(self, line):
     	tab = line.split(" ")
     	if (tab[0] == "test"):
@@ -104,9 +100,16 @@ class Prompt(cmd.Cmd):
         print tab
 
     def do_exit(self, line):
+        for p in processes:
+            if processes[p].statuss == "RUNNING" or processes[p].statuss == "STARTING":
+                processes[p].stop()
     	return True
 
     def do_EOF(self, line):
+        print ""
+        for p in processes:
+            if processes[p].statuss == "RUNNING" or processes[p].statuss == "STARTING":
+                processes[p].stop()
         return True
 
     def emptyline(self):
