@@ -76,7 +76,7 @@ class Proccess:
 		else:
 			self.env = None
 		if "autostart" in data:
-			self.start()
+			self.start(1)
 
 	def start(self, init=0):
 		if init == 0:
