@@ -68,38 +68,36 @@ class Proccess:
 			self.workingdir = data["workingdir"]
 		else:
 			self.workingdir = None
+		env = os.environ.copy()
 		if "env" in data:
-			self.env = data["env"]
+			for p in data["env"]:
+				env[p] = data["env"][p]
+			self.env = env
 		else:
 			self.env = None
 		if "autostart" in data:
 			self.start()
 
-
-
 	def start(self, init=0):
 		if init == 0:
 			print "Started : "+self.name
+		oldmask = os.umask(self.umask)
+		if self.stdout != None:
+			stdout = open(self.stdout, "w+")
+		else:
+			stdout = None
+		if self.stderr != None:
+			stderr = open(self.stderr, "w+")
+		else:
+			stderr = None
 		try:
-			oldmask = os.umask(self.umask)
-			if self.stdout != None:
-				stdout = open(self.stdout, "a+")
-			else:
-				stderr = None
-			if self.stderr != None:
-				stderr = open(self.stderr, "a+")
-			else:
-				stderr = None
-			my_env = os.environ.copy()
-			for key in self.env:
-				my_env[key] = self.env[key]
 			self.proccess = subprocess.Popen(
 				self.command,
 				shell = True,
 				stdin = subprocess.PIPE,
 				stdout = stdout,
 				stderr = stderr,
-				env = my_env);
+				env = self.env);
 			os.umask(oldmask)
 			self.pid = self.proccess.pid
 			self.startednb += 1
@@ -147,9 +145,9 @@ class Proccess:
 			self.statuss = "STOPPED"
 			self.starttime = None
 			if self.restart == "always" or self.restartnb >= self.startednb:
-				self.start()
+				self.start(1)
 			if self.restart == "unexpected" and self.rc not in self.returncodes:
-				self.start()
+				self.start(1)
 		elif self.running > 0:
 			if time.time() - self.starttime >= self.running:
 				self.statuss = "RUNNING"

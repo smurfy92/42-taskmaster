@@ -28,13 +28,12 @@ def init():
     try:
         with open('test.conf', 'r') as f:
             doc = load(f)
-        for proc in doc:
-            processes[proc] = Proccess(proc, doc[proc])
     except:
         print "Error in config file"
         log.error("Error in config file")
         sys.exit(0)
-    rows, columns = os.popen('stty size', 'r').read().split()
+    for proc in doc:
+        processes[proc] = Proccess(proc, doc[proc])
     print "\033[92m"+promptinit+"\033[0m"
 
 
@@ -94,10 +93,7 @@ class Prompt(cmd.Cmd):
                 print "no process named "+tab[0]
 
     def do_reload(self, line):
-    	tab = line.split(" ")
-    	if (tab[0] == "test"):
-    		print "your the boss"
-        print tab
+    	print "need to do it dude"
 
     def do_exit(self, line):
         for p in processes:
