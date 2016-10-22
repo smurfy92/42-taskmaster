@@ -90,22 +90,23 @@ class Proccess:
 			stderr = open(self.stderr, "w+")
 		else:
 			stderr = None
+		os.umask(oldmask)
 		try:
 			self.proccess = subprocess.Popen(
 				self.command,
+				cwd = self.workingdir,
 				shell = True,
 				stdin = subprocess.PIPE,
 				stdout = stdout,
 				stderr = stderr,
 				env = self.env);
-			os.umask(oldmask)
 			self.pid = self.proccess.pid
 			self.startednb += 1
 			if (self.running > 0):
 				self.statuss = "STARTING"
 			else:
 				self.statuss = "RUNNING"
-			self.starttime = time.time()
+			self.starttime = time.time() + 7200
 			log.info(" started : "+self.name + " uptime : "+time.strftime("%H:%M:%S", time.gmtime(self.starttime)))
 		except Exception, e:
 			log.warning("failed to launch"+self.name + ': ' + str(e))
@@ -113,7 +114,7 @@ class Proccess:
 
 	def status(self):
 		if (self.statuss == "RUNNING" or self.statuss == "STARTING"):
-			timer = time.time()
+			timer = time.time() + 7200
 			time_delta = time.gmtime(timer - self.starttime)
 			curr_time = time.strftime("%H:%M:%S", time_delta)
 			print ("NAME : {0} | STATUS : {1} | PID : {2} | UPTIME :"+ curr_time).format(self.name, self.statuss, str(self.pid))
@@ -148,6 +149,6 @@ class Proccess:
 				self.start(1)
 			if self.restart == "unexpected" and self.rc not in self.returncodes:
 				self.start(1)
-		elif self.running > 0:
-			if time.time() - self.starttime >= self.running:
+		elif self.running > 0 and self.starttime:
+			if (time.time() + 7200) - self.starttime >= self.running:
 				self.statuss = "RUNNING"

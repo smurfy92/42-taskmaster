@@ -20,6 +20,15 @@ promptinit = """\n
 |__________________________________________________________________________________________________________|
 """
 
+def error_config(name):
+    log.error("Error in config file " + name)
+    print "Error in config file in "+ name
+    sys.exit(0)
+def check_data(data):
+    for d in data:
+        if "command" not in data[d] or type(data[d]["command"]) is not str:
+            error_config("command")
+
 def loop():
     while True:
         copy = processes.copy()
@@ -35,6 +44,7 @@ def init():
         print "Error in config file"
         log.error("Error in config file")
         sys.exit(0)
+    check_data(doc)
     for proc in doc:
         processes[proc] = Proccess(proc, doc[proc])
     print "\033[92m"+promptinit+"\033[0m"
@@ -104,12 +114,21 @@ class Prompt(cmd.Cmd):
             log.error("Error in config file")
             sys.exit(0)
         todel = []
+        check_data(newdoc)
         for d in processes:
-            if processes[d] not in newdoc and processes[d].statuss == "STARTING" or processes[d].statuss == "RUNNING":
-                processes[d].proccess.terminate()
+            if d not in newdoc:
+                if processes[d].statuss == "STARTING" or processes[d].statuss == "RUNNING":
+                    processes[d].proccess.terminate()
                 todel.append(d)
+            else:
+                if newdoc[d]["command"] != processes[d].command and processes[d].statuss == "STARTING" or processes[d].statuss == "RUNNING":
+                    processes[d].stop()
+                processes[d] = Proccess(d, newdoc[d])
         for k in todel:
             processes.pop(k, None)
+        for p in newdoc:
+            if p not in processes:
+                processes[p] = Proccess(p, newdoc[p])
 
     def do_exit(self, line):
         for p in processes:
